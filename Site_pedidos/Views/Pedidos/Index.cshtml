@@ -1,0 +1,147 @@
+﻿@using Pedidos_view.Models
+@model IEnumerable<Pedidos>
+
+@{
+    ViewData["Title"] = "Pedidos REPELUB";
+}
+<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.2.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
+
+<!-- DataTables + Bootstrap 5 + Responsive CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap5.min.css">
+
+<!-- Scripts jQuery e DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
+
+<style>
+    nav {
+        background-color: red;
+    }
+
+    .background-vermelho {
+        background-color: #fb5252 !important;
+    }
+
+    .background-roxo {
+        background-color: #8a5aa7 !important;
+    }
+
+    .background-verde {
+        background-color: #32CD32 !important;
+    }
+
+    .background-azul {
+        background-color: deepskyblue !important;
+    }
+</style>
+
+<body data-bs-no-jquery>
+    <table id="tabelaUsuarios" class="table table-dark table-striped  nowrap w-00" style="width:100%">
+        <thead>
+            <tr>
+                <th>HORA</th>
+                <th>STATUS</th>
+                <th>CODIGO ERP</th>
+                <th>ASSESOR</th>
+                <th>DATA DE EMISSÃO</th>
+                <th>CODIGO</th>
+                <th>CLIENTE</th>
+                <th>PRODUTO</th>
+                <th>PREÇO PEDIDO</th>
+                <th>QUANTIDADE</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pedido in Model)
+            {
+                <tr>
+                    <td>@pedido.hora</td>
+                    <td>@pedido.status</td>
+                    <td>@pedido.pedido_ERP</td>
+                    <td>@pedido.assessor</td>
+                    <td>@pedido.data_emissao?.ToString("dd/MM/yyyy")</td>
+                    <td>@pedido.codigo</td>
+                    <td>@pedido.cliente</td>
+                    <td>@pedido.produto</td>
+                    <td>@pedido.preço_pedido</td>
+                    <td>@pedido.quantidade</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+
+<script>
+    $(document).ready(function(){
+        let table = $('#tabelaUsuarios').DataTable({
+            "ordering":true,
+            responsive:window.innerWidth < 1000 ? true : false,
+            columnDefs:
+            [
+
+                {responsivePriority: 1, targets: 0},
+                {responsivePriority: 2, targets: 1},
+                {responsivePriority: 3, targets: 2},
+                {responsivePriority: 4, targets: 3},
+                {responsivePriority: 5, targets: 4},
+                {responsivePriority: 6, targets: 5},
+                {responsivePriority: 7, targets: 6},
+            ],
+            "columnDefs": [
+                {
+                    "targets" : 4,
+                    "type" : 'date',
+                    "render" : function(data, type, row)
+                    {
+                        if(type === 'sort' || type === 'type')
+                        {
+                            var parts = data.split('/');
+                            return new Date(parts[2],parts[1] - 1, parts[0]);
+                        }
+                        return data;
+                    }
+                }
+
+            ],
+            "searching" : true,
+            order :[[4,'desc'], [1,'asc']   ],
+            "language" : {
+            "url": "https://cdn.datatables.net/plug-ins/1.11.3/i18n/pt_br.json"
+            },
+            pageLength : 1000,
+            "createdRow":function(row,data,dataIndex)
+            {
+            var statusCell = $(row).find('td:eq(1)');
+            var status = statusCell.text().trim();
+
+                if(status === "1-Pedido não gerado")
+                {
+                    statusCell.addClass('background-vermelho');
+                }
+                else if(status === "3-Bloqueado")
+                {
+                    statusCell.addClass('background-roxo');
+                }
+                else if(status=== "4-Liberado")
+                {
+                    statusCell.addClass('background-verde')
+                }
+                else if(status=== "2-Preço Divergente")
+                {
+                    statusCell.addClass('background-azul')
+                }
+
+            }
+            });
+
+
+    });
+
+</script>
